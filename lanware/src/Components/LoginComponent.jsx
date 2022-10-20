@@ -12,8 +12,9 @@ const LoginComponent = () => {
         e.preventDefault()
         if(username.length>0){
             console.log(username)
-            navigate('/home')
-            localStorage.setItem('currentUser',username)
+            navigate(`/home/:${username}`)
+            // localStorage.setItem('currentUser',username)
+            
         }else{
             toast.error("Enter a Valid Password",{autoClose:1000,position:toast.POSITION.TOP_CENTER});
         }

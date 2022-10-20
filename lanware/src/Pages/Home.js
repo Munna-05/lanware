@@ -4,19 +4,14 @@ import HomeComponent from '../Components/HomeComponent'
 import Posts from '../Components/Posts'
 import {io} from 'socket.io-client'
 import { useState } from 'react'
+import { useParams } from 'react-router-dom'
 const Home = () => {
+
     const [socket,setSocket]=useState(null)
-    const currentUser = localStorage.getItem('currentUser')
+    const username = useParams()
+    const currentUser = username
 
-    useEffect(()=>{
-        
-        setSocket(io("http://localhost:5000"))
-        // console.log(currentUser)
-    },[])
 
-    useEffect(()=>{
-        socket?.emit('newUser',currentUser)
-    },[socket,currentUser])
    
     const posts = [{
         key: '1',
@@ -35,19 +30,19 @@ const Home = () => {
     return (
         <div>
 
-            <Navbar socket={socket}/>
+            <Navbar/>
             
             {
                 posts.map((details)=>{
                     return(
                         <>
-                        <Posts currentUser={currentUser} key={details.key} socket={socket} name={details.name} fullname={details.fullname} profilepic={details.profilepic} postpic={details.postpic}  />
+                        <Posts currentUser={currentUser.username} key={details.key} socket={socket} name={details.name} fullname={details.fullname} profilepic={details.profilepic} postpic={details.postpic}  />
                         </>
                     )
                 })
             }
 
-
+            {/* <Posts post = {posts} currentUser={currentUser.username}/> */}
 
         </div>
     )

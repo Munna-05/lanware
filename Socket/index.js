@@ -6,30 +6,41 @@ const io = new Server({
     cors: {
         origin: 'http://localhost:3000'
     }
-});
+}, []);
+
+
 let OnlinUser = []
-const addNewUser = (username,socketId)=>{
 
-    !OnlinUser.some(user=>user.username === username) && OnlinUser.push({username,socketId})
+
+const addNewUser = (username, socketId) => {
+
+    !OnlinUser.some(user => user.username === username) && OnlinUser.push({ username, socketId })
 
 }
-const removeUser = (socketId)=>{
-    OnlinUser = OnlinUser.filter(user=>user.socketId!==socketId)
+const removeUser = (socketId) => {
+    OnlinUser = OnlinUser.filter(user => user.socketId !== socketId)
 }
-const getUser =(username)=>{
-    return OnlinUser.find(user=>user.username===username)
+const getUser = (username) => {
+    return OnlinUser.find(user => user.username === username)
 }
+
+
 
 io.on("connection", (socket) => {
-   
-    console.log('connected')
-    socket.on('newuser',(username)=>{
-        addNewUser(username,socket.id)
-        console.log(socket)
+    
+    socket.on('newUser', (username) => {
+        addNewUser(username, socket.id)
+        console.log(username,socket.id)
     })
-    socket.on('sendNotification',({senderName,receiverName})=>{
-        const receiver = receiverName
-        io.to(receiver.socketId).emit('getNotification',{senderName})
+    socket.on('liked',(data)=>{
+        console.log(data.receiver+' `s post liked by '+ data.sender)
+        
+    })
+    socket.on('commented',(data)=>{
+        console.log(data.sender + " commented on your Post .")
+    })
+    socket.on('shared',(data)=>{
+        console.log(data.sender+" shared your Post")
     })
     socket.on('disconnect', () => {
         console.log('someone disconnected')
@@ -37,5 +48,5 @@ io.on("connection", (socket) => {
     })
 });
 
-io.listen(5000); 
+io.listen(5000);
 

@@ -1,29 +1,57 @@
 import React from 'react'
 import { useState } from 'react'
-
+import { io } from 'socket.io-client'
+import { useEffect } from 'react'
+import Navbar from './Navbar'
 const Posts = (props) => {
     const [like, setLike] = useState(false)
     const [comment, setComment] = useState(false)
     const [share, setShare] = useState(false)
     const [follow,setFollow] = useState(false)
+    const [socket,setSocket] = useState()
 
-
+    useEffect(()=>{
+        const socket = io('http://localhost:5000')
+        socket.on('first',(msg)=>{console.log(msg)})
+        setSocket(io('http://localhost:5000'))
     
+    },[props.currentUser])
+    
+    useEffect(()=>{
+        if(socket){
+            socket.emit('newUser', props.currentUser)
+        }
+        console.log('newuser')
+    },[socket,props.currentUser])
+
     const likeHandler = () => {
         setLike(!like)
-        console.log('user liked your post')
-        props.socket.emit('sendNotification',{
-            senderName : props.currentUser,
-            receiverName:props.fullname
+       if(socket){
+        socket.emit('liked',{
+            sender:props.currentUser,
+            receiver:props.fullname
         })
+       }
     }
     const commentHandler = () => {
         setComment(!comment)
         console.log('user commented on your post')
+        if(socket){
+            socket.emit('commented',{
+                sender:props.currentUser,
+                receiver:props.fullname
+            })
+        }
     }
     const shareHandler =()=>{
         setShare(!share)
         console.log('user shared your post')
+        if(socket){
+            socket.emit('shared',{
+                sender:props.currentUser,
+                receiver:props.fullname
+            })
+        }
     }
     const followHandler = () =>{
         setFollow(!follow)
@@ -31,7 +59,11 @@ const Posts = (props) => {
     }
   return (
     <div>
-        <div className='w-1/4 
+        {/* <Navbar socket={socket}/> */}
+        
+       
+                <>
+                 <div className='w-1/4 
             bg-gradient-to-r from-sky-100 to-blue-100
             shadow shadow-lg shadow-slate-700 mx-auto rounded-lg my-2 pb-4' style={{ height: "auto" }}>
                     <div className='flex justify-between'>
@@ -80,7 +112,8 @@ const Posts = (props) => {
                         }
                     </div>
                 </div>
-
+</>
+            
     </div>
   )
 }
